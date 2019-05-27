@@ -5,6 +5,8 @@ import HTTP.HttpResponse;
 import Server.Resource.ResourceKeeper;
 
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class HttpServerHandler {
@@ -20,6 +22,13 @@ public class HttpServerHandler {
             codeAndReason.put(404, "Not Found");
             codeAndReason.put(405, "Method Not Allowed");
             codeAndReason.put(500, "Internal Server Error");
+        }
+    };
+    private Map<String, String> mime = new HashMap<>(){
+        {
+            mime.put("text/plain", ".txt");
+            mime.put("text/html", ".html");
+            mime.put("image/jpeg", ".jpeg");
         }
     };
     private ResourceKeeper resourceKeeper = new ResourceKeeper();
@@ -111,13 +120,19 @@ public class HttpServerHandler {
         String url = httpRequest.getUrl();
         String ifModified = httpRequest.getHeader("If-Modified-Since");
         if(ifModified != null){
-            do304(new Date());//未完成
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                do304(sdf.parse(ifModified));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                do500();
+            }
         }else {
             String fileName = getFileNameFromUrl(url);
             switch (resourceKeeper.getStatus(fileName)){
                 case "valid":
                     if(url == resourceKeeper.getPath(fileName)){
-                        do200();
+                        do200(readFile(url));
                     }else {
                         do301(resourceKeeper.getPath(fileName));
                     }
@@ -128,11 +143,49 @@ public class HttpServerHandler {
                 case "temp":
                     do302();
                     break;
+                default:
+                    do404();
             }
         }
     }
 
-    private void doPost(){}
+    private void doPost(){
+        String url = httpRequest.getUrl();
+        String contentType = httpRequest.getHeader("Content-type");
+        String s = httpRequest.getHeader("Content-length");
+        if(contentType == null || s == null){
+            do500();
+        }else {
+            int contentLength = Integer.parseInt(s);
+            if(contentLength != httpRequest.getBody().length){
+                do500();
+            }else{
+                String fileName = getNewFileName(contentType);
+                File f = new File(url + fileName);
+                if(!f.exists()){
+                    try {
+                        f.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        do500();
+                    }
+                }
+                try {
+                    FileOutputStream fop = new FileOutputStream(f);
+                    fop.write(httpRequest.getBody());
+                    fop.flush();
+                    fop.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    do500();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    do500();
+                }
+                do200("Received!");
+            }
+        }
+    }
 
     private void do405(){}
 
@@ -142,7 +195,9 @@ public class HttpServerHandler {
 
     private void do302(){}
 
-    private void do200(){}
+    private void do200(String prompt){}
+
+    private void do200(byte[] body){}
 
     private void do404(){}
 
@@ -167,5 +222,18 @@ public class HttpServerHandler {
         }else {
             return t[t.length-1];
         }
+    }
+
+    private String getNewFileName(String type){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String fileName = sdf.format(new Date()) + type;
+        int i= 1;
+        String status = resourceKeeper.getStatus(fileName);
+        while (status != null && status != "deleted") {
+            fileName = sdf.format(new Date()) + "(" + String.valueOf(i) + ")" + type;
+            i++;
+            status = resourceKeeper.getStatus(fileName);
+        }
+        return fileName;
     }
 }
