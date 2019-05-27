@@ -200,6 +200,10 @@ public class HttpServerHandler {
         }
     }
 
+    public byte[] getResponse(){
+        return httpResponse.toByteArray();
+    }
+
     private void do405(){
         Map<String, String> headers = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -313,5 +317,9 @@ public class HttpServerHandler {
         sb.append(" ");
         sb.append(codeAndReason.get(code));
         return sb.toString();
+    }
+
+    public boolean getConnectionState(){
+        return httpRequest.getConnectionState();
     }
 }

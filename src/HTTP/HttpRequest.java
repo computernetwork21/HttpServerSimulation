@@ -31,4 +31,9 @@ public class HttpRequest extends HttpObject {
         return version;
     }
 
+    public boolean getConnectionState(){
+        String state = headers.get("Connection");
+        return state==null;
+    }
+
 }
