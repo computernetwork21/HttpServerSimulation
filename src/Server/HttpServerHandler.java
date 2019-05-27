@@ -13,7 +13,7 @@ public class HttpServerHandler {
 
     private HttpResponse httpResponse;
     private HttpRequest httpRequest;
-    private Map<Integer, String> codeAndReason = new HashMap<Integer, String>(){
+    private static Map<Integer, String> codeAndReason = new HashMap<Integer, String>(){
         {
             codeAndReason.put(200, "OK");
             codeAndReason.put(301, "Moved Permanently");
@@ -24,11 +24,18 @@ public class HttpServerHandler {
             codeAndReason.put(500, "Internal Server Error");
         }
     };
-    private Map<String, String> mime = new HashMap<>(){
+    private static Map<String, String> mime = new HashMap<>(){
         {
             mime.put("text/plain", ".txt");
             mime.put("text/html", ".html");
             mime.put("image/jpeg", ".jpeg");
+        }
+    };
+    private static Map<String, String> reversedmime = new HashMap<>(){
+        {
+            reversedmime.put("txt", "text/plain");
+            reversedmime.put("html", "text/html");
+            reversedmime.put(".jpeg", "image/jpeg");
         }
     };
     private ResourceKeeper resourceKeeper = new ResourceKeeper();
@@ -121,18 +128,23 @@ public class HttpServerHandler {
         String ifModified = httpRequest.getHeader("If-Modified-Since");
         if(ifModified != null){
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            File f = new File(url);
             try {
-                do304(sdf.parse(ifModified));
+                if(new Date(f.lastModified()).after(sdf.parse(ifModified))){
+                    do200(readFile(url), url.split("\\.")[1]);
+                }else{
+                    do304();
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
-                do500();
             }
         }else {
             String fileName = getFileNameFromUrl(url);
+            String type = fileName.split("\\.")[1];
             switch (resourceKeeper.getStatus(fileName)){
                 case "valid":
                     if(url == resourceKeeper.getPath(fileName)){
-                        do200(readFile(url));
+                        do200(readFile(url), type);
                     }else {
                         do301(resourceKeeper.getPath(fileName));
                     }
@@ -141,7 +153,7 @@ public class HttpServerHandler {
                     do404();
                     break;
                 case "temp":
-                    do302();
+                    do302(url);
                     break;
                 default:
                     do404();
@@ -175,6 +187,7 @@ public class HttpServerHandler {
                     fop.write(httpRequest.getBody());
                     fop.flush();
                     fop.close();
+                    resourceKeeper.addFile(fileName, url);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     do500();
@@ -187,21 +200,77 @@ public class HttpServerHandler {
         }
     }
 
-    private void do405(){}
+    private void do405(){
+        Map<String, String> headers = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("Date", sdf.format(new Date()));
+        headers.put("Allow", "GET, POST");
+        httpResponse = new HttpResponse(buildStartLine(405), headers, null);
+    }
 
-    private void do304(Date sinceDate){}
+    private void do304(){
+        Map<String, String> headers = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("Date", sdf.format(new Date()));
+        httpResponse = new HttpResponse(buildStartLine(304), headers, null);
+    }
 
-    private void do301(String newPath){}
+    private void do301(String newPath){
+        Map<String, String> headers = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("Date", sdf.format(new Date()));
+        headers.put("Location", newPath);
+        headers.put("Content-type", "text/plain");
+        String s = "资源新地址：" + newPath;
+        byte[] body = s.getBytes();
+        headers.put("Content-length", String.valueOf(body.length));
+        httpResponse = new HttpResponse(buildStartLine(301), headers, body);
+    }
 
-    private void do302(){}
+    private void do302(String tempPath){
+        Map<String, String> headers = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("Date", sdf.format(new Date()));
+        headers.put("Location", tempPath);
+        headers.put("Content-type", "text/plain");
+        String s = "资源临时地址：" + tempPath;
+        byte[] body = s.getBytes();
+        headers.put("Content-length", String.valueOf(body.length));
+        httpResponse = new HttpResponse(buildStartLine(302), headers, body);
+    }
 
-    private void do200(String prompt){}
+    private void do200(String prompt){
+        Map<String, String> headers = new HashMap<>();
+        byte[] body = prompt.getBytes();
+        headers.put("Content-type", "text/plain");
+        headers.put("Content-length", String.valueOf(body.length));
+        httpResponse = new HttpResponse(buildStartLine(200), headers, body);
+    }
 
-    private void do200(byte[] body){}
+    private void do200(byte[] body, String type){
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-type", reversedmime.get(type));
+        headers.put("Content-length", String.valueOf(body.length));
+        httpResponse = new HttpResponse(buildStartLine(200), headers, body);
+    }
 
-    private void do404(){}
+    private void do404(){
+        Map<String, String> headers = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("Date", sdf.format(new Date()));
+        headers.put("Content-type", "text/plain");
+        String s = "文件不存在！";
+        byte[] body = s.getBytes();
+        headers.put("Content-length", String.valueOf(body.length));
+        httpResponse = new HttpResponse(buildStartLine(404), headers, body);
+    }
 
-    private void do500(){}
+    private void do500(){
+        Map<String, String> headers = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("Date", sdf.format(new Date()));
+        httpResponse = new HttpResponse(buildStartLine(500), headers, null);
+    }
 
     private byte[] readFile(String url){
         File file = new File(url);
@@ -235,5 +304,14 @@ public class HttpServerHandler {
             status = resourceKeeper.getStatus(fileName);
         }
         return fileName;
+    }
+
+    private String buildStartLine(int code){
+        StringBuffer sb = new StringBuffer();
+        sb.append("HTTP/1.1 ");
+        sb.append(code);
+        sb.append(" ");
+        sb.append(codeAndReason.get(code));
+        return sb.toString();
     }
 }

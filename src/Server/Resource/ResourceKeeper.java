@@ -15,8 +15,8 @@ public class ResourceKeeper {
 
     public String getPath(String fileName){return filePath.get(fileName);}
 
-    public void addFile(String fileName){
+    public void addFile(String fileName, String url){
         fileStatus.put(fileName, "valid");
-        filePath.put(fileName, "New/"+fileName);
+        filePath.put(fileName, url+fileName);
     }
 }
