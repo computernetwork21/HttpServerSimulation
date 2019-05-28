@@ -55,6 +55,7 @@ public class HttpObject {
         for (String name : headers.keySet()) {
             sb.append(name + ": " + headers.get(name) + "\r\n");
         }
+        sb.append("\r\n");
         return sb.toString();
     }
 

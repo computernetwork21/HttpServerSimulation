@@ -13,31 +13,9 @@ public class HttpServerHandler {
 
     private HttpResponse httpResponse;
     private HttpRequest httpRequest;
-    private static Map<Integer, String> codeAndReason = new HashMap<Integer, String>(){
-        {
-            codeAndReason.put(200, "OK");
-            codeAndReason.put(301, "Moved Permanently");
-            codeAndReason.put(302, "Found");
-            codeAndReason.put(304, "Not Modified");
-            codeAndReason.put(404, "Not Found");
-            codeAndReason.put(405, "Method Not Allowed");
-            codeAndReason.put(500, "Internal Server Error");
-        }
-    };
-    private static Map<String, String> mime = new HashMap<>(){
-        {
-            mime.put("text/plain", ".txt");
-            mime.put("text/html", ".html");
-            mime.put("image/jpeg", ".jpeg");
-        }
-    };
-    private static Map<String, String> reversedmime = new HashMap<>(){
-        {
-            reversedmime.put("txt", "text/plain");
-            reversedmime.put("html", "text/html");
-            reversedmime.put(".jpeg", "image/jpeg");
-        }
-    };
+    private Map<Integer, String> codeAndReason = new HashMap<Integer, String>();
+    private Map<String, String> mime = new HashMap<>();
+    private Map<String, String> reversedmime = new HashMap<>();
     private ResourceKeeper resourceKeeper = new ResourceKeeper();
 
     /**
@@ -51,6 +29,21 @@ public class HttpServerHandler {
         char temp;
         int flag = 0;
         boolean isBody = false;
+        codeAndReason.put(200, "OK");
+        codeAndReason.put(301, "Moved Permanently");
+        codeAndReason.put(302, "Found");
+        codeAndReason.put(304, "Not Modified");
+        codeAndReason.put(404, "Not Found");
+        codeAndReason.put(405, "Method Not Allowed");
+        codeAndReason.put(500, "Internal Server Error");
+
+        mime.put("text/plain", ".txt");
+        mime.put("text/html", ".html");
+        mime.put("image/jpeg", ".jpeg");
+
+        reversedmime.put("txt", "text/plain");
+        reversedmime.put("html", "text/html");
+        reversedmime.put(".jpeg", "image/jpeg");
 
         ArrayList<Byte> body = new ArrayList<>();
         String startLine;
@@ -123,6 +116,11 @@ public class HttpServerHandler {
         return httpResponse.startLineAndHeadersToString();
     }
 
+    public String getResponseString(){
+        String body = new String(httpResponse.getBody());
+        return getResponseStartLineAndHeaders()+body;
+    }
+
     private void doGet(){
         String url = httpRequest.getUrl();
         String ifModified = httpRequest.getHeader("If-Modified-Since");
@@ -143,7 +141,7 @@ public class HttpServerHandler {
             String type = fileName.split("\\.")[1];
             switch (resourceKeeper.getStatus(fileName)){
                 case "valid":
-                    if(url == resourceKeeper.getPath(fileName)){
+                    if(url.equals(resourceKeeper.getPath(fileName))){
                         do200(readFile(url), type);
                     }else {
                         do301(resourceKeeper.getPath(fileName));
@@ -299,10 +297,10 @@ public class HttpServerHandler {
 
     private String getNewFileName(String type){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String fileName = sdf.format(new Date()) + type;
+        String fileName = sdf.format(new Date()) + mime.get(type);
         int i= 1;
         String status = resourceKeeper.getStatus(fileName);
-        while (status != null && status != "deleted") {
+        while (status != null && !status.equals("deleted")) {
             fileName = sdf.format(new Date()) + "(" + String.valueOf(i) + ")" + type;
             i++;
             status = resourceKeeper.getStatus(fileName);
