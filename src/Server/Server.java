@@ -7,12 +7,23 @@ import java.util.ArrayList;
 public class Server extends Thread{
     private ServerSocket serverSocket;
 
+    public static void main(String [] args) {
+        int port = 80;
+        try
+        {
+            Thread t = new Server(port);
+            t.run();
+        }catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public Server(int port) throws IOException {
         serverSocket = new ServerSocket(port);
     }
 
-    public void run()
-    {
+    public void run() {
         while(true)
         {
             try
@@ -48,20 +59,8 @@ public class Server extends Thread{
             }
         }
     }
-    public static void main(String [] args)
-    {
-        int port = 80;
-        try
-        {
-            Thread t = new Server(port);
-            t.run();
-        }catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
 
-    private byte[] copyValidByte(byte[] read){
+    private byte[] copyValidByte(byte[] read) {
         ArrayList<Byte> t = new ArrayList<>();
         int count = 0;
         for(byte b : read){

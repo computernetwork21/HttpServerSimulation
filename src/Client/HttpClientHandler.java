@@ -2,16 +2,14 @@ package Client;
 
 import HTTP.HttpRequest;
 import HTTP.HttpResponse;
-import Server.Resource.ResourceKeeper;
 
-import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.io.*;
-import java.text.FieldPosition;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class HttpClientHandler {
 
@@ -200,7 +198,7 @@ public class HttpClientHandler {
         while(true){
             try {
                 fileName=br.readLine();
-                fileName="src\\Client\\Resource"+fileName+httpResponse.getHeader("Content-type");
+                fileName="src\\Client\\Resource"+fileName+mimes.get(httpResponse.getHeader("Content-type"));
                 if(new File(fileName).exists()){
                     //文件已存在
                     System.out.println("文件已存在，请重新输入文件名。");
@@ -215,7 +213,7 @@ public class HttpClientHandler {
         File file = new File(fileName);
         try {
             file.createNewFile();
-            if(httpResponse.getHeader("Content-type").equals(".jpeg")){
+            if(httpResponse.getHeader("Content-type").equals("image/jpeg")){
                 FileImageOutputStream imageOutput = new FileImageOutputStream(file);
                 imageOutput.write(httpResponse.getBody(), 0,httpResponse.getBody().length);
                 imageOutput.close();

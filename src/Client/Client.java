@@ -7,16 +7,13 @@ import java.util.Scanner;
 
 public class Client extends Thread{
     private Socket client=null;
-    private String stillWord="报文";
 
     public static void main(String[] args) {
         Thread t = new Client(80);
         t.start();
     }
 
-    public Client(int port)
-    {
-//        keyin = new BufferedReader(new InputStreamReader(System.in));
+    public Client(int port) {
         try
         {
             client = new Socket("host", port);
@@ -28,8 +25,7 @@ public class Client extends Thread{
 
     }
 
-    public void run()
-    {
+    public void run() {
         try
         {
             InputStream inputStream = client.getInputStream();//服务器端发回的数据
@@ -37,7 +33,9 @@ public class Client extends Thread{
             while (true)
             {
                 System.out.println("client is ready");
-                Scanner cin = new Scanner(System.in);
+                String fileName="src\\Client\\Resource\\"+"20190528232257.jpeg";
+                File file = new File(fileName);
+                Scanner cin = new Scanner(file);
                 String request = "";
                 while (true) {
                     String temp=cin.nextLine();
@@ -67,6 +65,7 @@ public class Client extends Thread{
             e.printStackTrace();
         }
     }
+    
     private byte[] copyValidByte(byte[] read){
         ArrayList<Byte> t = new ArrayList<>();
         int count = 0;
