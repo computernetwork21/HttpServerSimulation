@@ -16,7 +16,7 @@ public class Client extends Thread{
     public Client(int port) {
         try
         {
-            client = new Socket("host", port);
+            client = new Socket("127.0.0.1", port);
         }
         catch (Exception e)
         {
@@ -65,7 +65,7 @@ public class Client extends Thread{
             e.printStackTrace();
         }
     }
-    
+
     private byte[] copyValidByte(byte[] read){
         ArrayList<Byte> t = new ArrayList<>();
         int count = 0;
