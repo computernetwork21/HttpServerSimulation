@@ -8,6 +8,8 @@ public class HttpResponse extends HttpObject{
     private String version;
     private int stateCode;
     private String reason;
+    private Map<String,String> headers;
+    private byte[] body;
 
 
     public HttpResponse(String startLine, Map<String, String> headers, byte[] body){
@@ -29,4 +31,11 @@ public class HttpResponse extends HttpObject{
         return stateCode;
     }
 
+    public Map<String,String> getHeaders(){
+        return headers;
+    }
+
+    public byte[] getBody(){
+        return body;
+    }
 }

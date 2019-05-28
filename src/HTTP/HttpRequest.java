@@ -7,6 +7,8 @@ public class HttpRequest extends HttpObject {
     private String method;
     private String url;
     private String version;
+    private Map<String,String> headers;
+    private byte[] body;
 
     public HttpRequest(String startLine, Map<String, String> headers, byte[] body){
         this.startLine = startLine;
@@ -31,9 +33,16 @@ public class HttpRequest extends HttpObject {
         return version;
     }
 
+    public Map<String,String> getHeaders(){
+        return headers;
+    }
+
+    public byte[] getBody(){
+        return body;
+    }
+
     public boolean getConnectionState(){
         String state = headers.get("Connection");
         return state==null;
     }
-
 }

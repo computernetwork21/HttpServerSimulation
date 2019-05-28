@@ -1,10 +1,276 @@
 package Client;
 
+import HTTP.HttpRequest;
+import HTTP.HttpResponse;
+import Server.Resource.ResourceKeeper;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class HttpClientHandler {
 
     //解析报文，并处理
     //对mime类型的处理
     //对301、302、304的处理???重定向的处理
 
+    private static String method;
+    private static byte[] body0;
+    private HttpRequest httpRequest;
+    private HttpResponse httpResponse;
+    private static Map<Integer, String> codeAndReason = new HashMap<Integer, String>(){
+        {
+            codeAndReason.put(200, "OK");
+            codeAndReason.put(301, "Moved Permanently");
+            codeAndReason.put(302, "Found");
+            codeAndReason.put(304, "Not Modified");
+            codeAndReason.put(404, "Not Found");
+            codeAndReason.put(405, "Method Not Allowed");
+            codeAndReason.put(500, "Internal Server Error");
+        }
+    };
+    private static Map<String, String> mimes = new HashMap<>(){
+        {
+            mimes.put("text/plain", ".txt");
+            mimes.put("text/html", ".html");
+            mimes.put("image/jpeg", ".jpeg");
+        }
+    };
+    public HttpClientHandler(byte[] requestData,byte[] responseData) throws IOException{
+        //解析请求报文
+        StringBuffer sb0 = new StringBuffer();
+        char temp0;
+        int flag0 = 0;
 
+        /**
+         * 开始行，\r\n首次出现
+         */
+        for(int i=0; i<requestData.length; i++){
+            temp0 = (char) requestData[i];
+            if(temp0 == '\r' || temp0 == '\n'){
+                flag0++;
+            }else {
+                flag0 = 0;
+            }
+            if(flag0 == 2){
+                break;
+            }
+            sb0.append(temp0);
+        }
+        String[] startLineInfo = sb0.toString().split(" ");
+        method=startLineInfo[0];
+        //body
+        flag0=0;
+        int j=0;
+        for(; j<requestData.length; j++){
+            temp0 = (char) requestData[j];
+            if(temp0 == '\r' || temp0 == '\n'){
+                flag0++;
+            }else {
+                flag0 = 0;
+            }
+            if(flag0 == 4){
+                break;
+            }
+        }
+        body0=requestData.toString().substring(j).getBytes();
+
+        //解析响应报文
+        StringBuffer sb = new StringBuffer();
+        char temp;
+        int flag = 0;
+        boolean isBody = false;
+
+        ArrayList<Byte> body = new ArrayList<>();
+        String startLine;
+        Map<String, String> headers = new HashMap<>();
+
+        /*
+        对字节数组进行转换，在\r\n出现两次的情况认为首部结束，剩下的是主体部分
+         */
+        for(int i=0; i<responseData.length; i++){
+            if(isBody){
+                body.add(responseData[i]);
+            }else {
+                temp = (char) responseData[i];
+                if(temp == '\r' || temp == '\n'){
+                    flag++;
+                }else {
+                    flag = 0;
+                }
+                if(flag == 4){
+                    isBody = true;
+                }
+                sb.append(temp);
+            }
+        }
+
+        /*
+        对开始行和首部信息进行读取，默认每行的结尾都是\r\n
+         */
+        String[] text = sb.toString().split("\r\n");
+        startLine = text[0];
+        for (int i=1; i<text.length; i++){
+            if(text[i] != ""){
+                String[] header = text[i].split(": ");
+                headers.put(header[0], header[1]);
+            }
+        }
+
+        /*
+        将主体的Byte[]变成byte[]
+        是否有更方便的做法？
+         */
+        byte[] res = new byte[body.size()];
+        for(int i=0; i<body.size(); i++){
+            res[i] = body.get(i).byteValue();
+        }
+
+        httpResponse = new HttpResponse(startLine, headers, res);
+    }
+
+    /**
+     * 客户端做出响应
+     * 返回给客户端状态码，提示下一步操作
+     */
+    private int response(){
+        //检查状态码
+        int statusCode = httpResponse.getStateCode();
+        switch (statusCode){
+            case 200:
+                return do200();
+            case 301:
+                return 301;
+            case 302:
+                return 302;
+            case 304:
+                return do304();
+            case 404:                                           //暂定
+                System.out.println("Not found");
+                return 404;
+            case 405:
+                System.out.println("方法不支持。");
+                return 405;
+            default:
+                System.out.println("Internal server error");
+                return 500;
+        }
+    }
+
+    private void show(String fileName){
+        String filePath = "src\\Client\\Resource"+fileName;
+        String mime = httpResponse.getHeaders().get("Content-type");
+        switch (mime){
+            case ".txt":
+                filePath=filePath+".txt";
+                break;
+            case  ".html":
+                filePath=filePath+".html";
+                break;
+            default:
+                filePath=filePath+".jpeg";
+                break;
+        }
+        File file = new File(filePath);
+        try {
+            Desktop.getDesktop().open(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    private int do200(){
+        if(httpResponse.getBody().equals("Received!".getBytes())){
+            //请求报文方法是POST
+            System.out.println("服务器端已收到。"); //暂定
+            return 2001;
+        }
+        return 2001; //等待输入文件名
+
+    }
+    private void saveFile(String fileName){
+        String filePath = "src\\Client\\Resource"+fileName;
+        String mime = httpResponse.getHeaders().get("Content-type");
+        switch (mime){
+            case ".txt":
+                filePath=filePath+".txt";
+                break;
+            case  ".html":
+                filePath=filePath+".html";
+                break;
+            default:
+                filePath=filePath+".jpeg";
+                break;
+        }
+        File file = new File(filePath);
+        try {
+            file.createNewFile();
+            FileWriter fw = new FileWriter(file);
+            fw.write(httpResponse.getBody().toString());
+            fw.close();
+            System.out.println("文件已保存在"+filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] do301(){
+        //更新URL
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept","*");
+        headers.put("Host",httpResponse.getBody().toString().substring(12));
+        httpRequest=new HttpRequest(buildStartLine(httpResponse.getBody().toString().substring(12)),headers,null);
+        return http2bytes();
+    }
+    private byte[] do302(){
+        //更新URL
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept","*");
+        headers.put("Host",httpResponse.getBody().toString().substring(14));
+        httpRequest=new HttpRequest(buildStartLine(httpResponse.getBody().toString().substring(14)),headers,body0);
+        return http2bytes();
+    }
+    private int do304(){
+        System.out.println("已刷新。");
+        return 304;
+    }
+
+    private void showText(){
+        System.out.println(httpResponse.getBody());
+    }
+    private void showPicture(){
+        //图片位置
+        Image image = null;
+        try {
+            image = ImageIO.read(new File("Server/Resource/1.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(image.getSource());
+    }
+    private void showHTML(){
+        //   System.out.println(httpResponse.getBody());
+    }
+    private String buildStartLine(String url){
+        //请求报文<method><url><version>
+        StringBuffer sb = new StringBuffer();
+        sb.append(method);
+        sb.append(url);
+        sb.append("HTTP/1.1 ");
+        return sb.toString();
+    }
+
+    private byte[] http2bytes(){
+        String temp = "";
+        temp=temp+httpRequest.getMethod()+" "+httpRequest.getUrl()+" "+httpRequest.getVersion()+"\r\n";
+        Map<String,String> headers = httpRequest.getHeaders();
+        for(String key:headers.keySet()){
+            temp=temp+key+":"+headers.get(key)+"\r\n";
+        }
+        temp=temp+"\r\n"+httpRequest.getBody().toString()+"\r\n";
+        return temp.getBytes();
+    }
 }
