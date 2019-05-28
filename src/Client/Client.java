@@ -30,8 +30,8 @@ public class Client extends Thread{
         {
             InputStream inputStream = client.getInputStream();//服务器端发回的数据
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
-            while (true)
-            {
+//            while (true)
+//            {
                 System.out.println("client is ready");
                 String fileName="src\\Client\\Resource\\"+"testMessage1";
                 File file=new File(fileName);
@@ -54,7 +54,7 @@ public class Client extends Thread{
                         outputStream.write(hch.do302());
                         //发给服务器端
                 }
-            }
+//            }
         }
         catch (Exception e)
         {

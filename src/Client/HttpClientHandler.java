@@ -7,6 +7,7 @@ import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class HttpClientHandler {
     private static byte[] body0;
     private HttpRequest httpRequest;
     private HttpResponse httpResponse;
-    private static Map<Integer, String> codeAndReason = new HashMap<Integer, String>(){
+   /** private static Map<Integer, String> codeAndReason = new HashMap<Integer, String>(){
         {
             codeAndReason.put(200, "OK");
             codeAndReason.put(301, "Moved Permanently");
@@ -31,15 +32,14 @@ public class HttpClientHandler {
             codeAndReason.put(405, "Method Not Allowed");
             codeAndReason.put(500, "Internal Server Error");
         }
-    };
-    private static Map<String, String> mimes = new HashMap<>(){
-        {
-            mimes.put("text/plain", ".txt");
-            mimes.put("text/html", ".html");
-            mimes.put("image/jpeg", ".jpeg");
-        }
-    };
+    };*/
+    private static   Map<String, String> mimes = new HashMap<>();
+
+
     public HttpClientHandler(byte[] requestData,byte[] responseData) throws IOException{
+        mimes.put("text/plain", ".txt");
+        mimes.put("text/html", ".html");
+        mimes.put("image/jpeg", ".jpeg");
         //解析请求报文
         StringBuffer sb0 = new StringBuffer();
         char temp0;
@@ -76,7 +76,8 @@ public class HttpClientHandler {
                 break;
             }
         }
-        body0=requestData.toString().substring(j).getBytes();
+        //body0=requestData.toString().substring(j).getBytes();
+        body0= Arrays.copyOfRange(requestData,j,requestData.length);
 
         //解析响应报文
         StringBuffer sb = new StringBuffer();
