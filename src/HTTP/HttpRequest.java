@@ -7,7 +7,6 @@ public class HttpRequest extends HttpObject {
     private String method;
     private String url;
     private String version;
-    private byte[] body;
 
     public HttpRequest(String startLine, Map<String, String> headers, byte[] body){
         this.startLine = startLine;

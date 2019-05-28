@@ -8,7 +8,6 @@ public class HttpResponse extends HttpObject{
     private String version;
     private int stateCode;
     private String reason;
-    private byte[] body;
 
 
     public HttpResponse(String startLine, Map<String, String> headers, byte[] body){
