@@ -12,8 +12,9 @@ public class ServerTest {
     public static void main(String[] args) throws IOException {
         String serverName = "localhost";
 
-        String startLine = "GET src/Server/Resource/1.jpeg HTTP/1.1";
+        String startLine = "GET src/Server/Resource/Old/2.txt HTTP/1.1";
         Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", "*");
 //        File f = new File("src/Server/Resource/1.jpg");
 //        InputStream ips = new FileInputStream(f);
 //        byte[] body = ips.readAllBytes();
