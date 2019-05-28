@@ -7,6 +7,7 @@ import Server.Resource.ResourceKeeper;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.*;
+import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -188,9 +189,42 @@ public class HttpClientHandler {
             System.out.println("服务器端已收到。"); //暂定
             return 2001;
         }
-        return 2002; //等待输入文件名
+
+        //请求报文是get方法
+        //用户输入文件名，验证是否重名，然后保存
+        System.out.println("请输入一个文件名：");
+        InputStreamReader is = new InputStreamReader(System.in); //new构造InputStreamReader对象
+        BufferedReader br = new BufferedReader(is); //拿构造的方法传到BufferedReader中，此时获取到的就是整个缓存流
+        String fileName="";
+        while(true){
+            try {
+                fileName=br.readLine();
+                fileName="src\\Client\\Resource"+fileName+httpResponse.getHeaders().get("Content-type");
+                if(new File(fileName).exists()){
+                    //文件已存在
+                    System.out.println("文件已存在，请重新输入文件名。");
+                }
+                else{
+                    break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        File file = new File(fileName);
+        try {
+            file.createNewFile();
+            FileWriter fw = new FileWriter(file);
+            fw.write(httpResponse.getBody().toString());
+            fw.close();
+            System.out.println("文件已保存在"+fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 2002;
 
     }
+    /*
     public void saveFile(String fileName){
         String filePath = "src\\Client\\Resource"+fileName;
         String mime = httpResponse.getHeaders().get("Content-type");
@@ -215,7 +249,7 @@ public class HttpClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    } */
 
     public byte[] do301(){
         //更新URL
