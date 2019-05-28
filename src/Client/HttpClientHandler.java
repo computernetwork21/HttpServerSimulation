@@ -5,6 +5,7 @@ import HTTP.HttpResponse;
 import Server.Resource.ResourceKeeper;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.io.*;
 import java.text.FieldPosition;
@@ -163,7 +164,7 @@ public class HttpClientHandler {
 
     public void show(String fileName){
         String filePath = "src\\Client\\Resource"+fileName;
-        String mime = httpResponse.getHeaders().get("Content-type");
+        String mime = httpResponse.getHeader("Content-type");
         switch (mime){
             case ".txt":
                 filePath=filePath+".txt";
@@ -199,7 +200,7 @@ public class HttpClientHandler {
         while(true){
             try {
                 fileName=br.readLine();
-                fileName="src\\Client\\Resource"+fileName+httpResponse.getHeaders().get("Content-type");
+                fileName="src\\Client\\Resource"+fileName+httpResponse.getHeader("Content-type");
                 if(new File(fileName).exists()){
                     //文件已存在
                     System.out.println("文件已存在，请重新输入文件名。");
@@ -214,9 +215,16 @@ public class HttpClientHandler {
         File file = new File(fileName);
         try {
             file.createNewFile();
-            FileWriter fw = new FileWriter(file);
-            fw.write(httpResponse.getBody().toString());
-            fw.close();
+            if(httpResponse.getHeader("Content-type").equals(".jpeg")){
+                FileImageOutputStream imageOutput = new FileImageOutputStream(file);
+                imageOutput.write(httpResponse.getBody(), 0,httpResponse.getBody().length);
+                imageOutput.close();
+            }
+            else{
+                FileWriter fw = new FileWriter(file);
+                fw.write(httpResponse.getBody().toString());
+                fw.close();
+            }
             System.out.println("文件已保存在"+fileName);
         } catch (IOException e) {
             e.printStackTrace();
