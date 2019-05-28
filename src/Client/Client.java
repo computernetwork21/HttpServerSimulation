@@ -53,18 +53,11 @@ public class Client extends Thread{
 
                 int state=hch.response();
                 switch (state){
-                    case 2002:
-                        String name=do200GET();//添加文件名
-                        hch.saveFile("");
-                        System.out.println("show the flie?[yes,no]");
-                        if (true){
-                            hch.show("");
-                        }
                     case 301:
-                        hch.do301();
+                        outputStream.write(hch.do301());
                         //发给服务器端
                     case  302:
-                        hch.do302();
+                        outputStream.write(hch.do302());
                         //发给服务器端
                 }
             }
@@ -91,10 +84,7 @@ public class Client extends Thread{
         }
         return data;
     }
-    public String do200GET(){
-        System.out.println("Please name the file:");
-        return "";
-    }
+
     //发送/接收
     //设计一套用户指令，包括 发送报文、构建报文（纯文本报文/带文件报文）、打印发送的报文、打印收到的报文的开始行和首部
     //如果是纯文字/文本文件报文，用户可以查看内容（自动？）；如果是图片，则可以查看图片保存的位置
