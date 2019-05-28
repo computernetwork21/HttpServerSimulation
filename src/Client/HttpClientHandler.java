@@ -136,7 +136,7 @@ public class HttpClientHandler {
      * 客户端做出响应
      * 返回给客户端状态码，提示下一步操作
      */
-    private int response(){
+    public int response(){
         //检查状态码
         int statusCode = httpResponse.getStateCode();
         switch (statusCode){
@@ -160,7 +160,7 @@ public class HttpClientHandler {
         }
     }
 
-    private void show(String fileName){
+    public void show(String fileName){
         String filePath = "src\\Client\\Resource"+fileName;
         String mime = httpResponse.getHeaders().get("Content-type");
         switch (mime){
@@ -188,10 +188,10 @@ public class HttpClientHandler {
             System.out.println("服务器端已收到。"); //暂定
             return 2001;
         }
-        return 2001; //等待输入文件名
+        return 2002; //等待输入文件名
 
     }
-    private void saveFile(String fileName){
+    public void saveFile(String fileName){
         String filePath = "src\\Client\\Resource"+fileName;
         String mime = httpResponse.getHeaders().get("Content-type");
         switch (mime){
@@ -217,7 +217,7 @@ public class HttpClientHandler {
         }
     }
 
-    private byte[] do301(){
+    public byte[] do301(){
         //更新URL
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept","*");
@@ -225,7 +225,7 @@ public class HttpClientHandler {
         httpRequest=new HttpRequest(buildStartLine(httpResponse.getBody().toString().substring(12)),headers,null);
         return http2bytes();
     }
-    private byte[] do302(){
+    public byte[] do302(){
         //更新URL
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept","*");
@@ -238,22 +238,6 @@ public class HttpClientHandler {
         return 304;
     }
 
-    private void showText(){
-        System.out.println(httpResponse.getBody());
-    }
-    private void showPicture(){
-        //图片位置
-        Image image = null;
-        try {
-            image = ImageIO.read(new File("Server/Resource/1.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(image.getSource());
-    }
-    private void showHTML(){
-        //   System.out.println(httpResponse.getBody());
-    }
     private String buildStartLine(String url){
         //请求报文<method><url><version>
         StringBuffer sb = new StringBuffer();
