@@ -1,7 +1,7 @@
 package Client;
 
-import java.net.*;
 import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -33,17 +33,13 @@ public class Client extends Thread{
             while (true)
             {
                 System.out.println("client is ready");
-                String fileName="src\\Client\\Resource\\"+"20190528232257.jpeg";
-                File file = new File(fileName);
-                Scanner cin = new Scanner(file);
+                String fileName="src\\Client\\Resource\\"+"testMessage1";
+                File file=new File(fileName);
+                Scanner sc=new Scanner(file);
                 String request = "";
-                while (true) {
-                    String temp=cin.nextLine();
-                    request=request+temp;
-                    if(!cin.hasNext()){break;}
-                }
+                request=request+sc.nextLine();
+                System.out.println(request);
                 outputStream.write(request.getBytes());
-
                 byte[] temp=new byte[102400];
                 inputStream.read(temp);
                 byte[] out=copyValidByte(temp);
@@ -92,4 +88,5 @@ public class Client extends Thread{
     //读取用户指令
     //预存示例用的报文？
     //需要打日志吗？
+
 }
