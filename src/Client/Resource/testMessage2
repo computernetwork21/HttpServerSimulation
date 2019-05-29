@@ -1,4 +1,0 @@
-GET src/Server/Resource/1.jpeg HTTP/1.1
-If-modified-since:2019-05-20 09:19:29
-Connection:keep-alive
-

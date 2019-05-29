@@ -1,11 +1,9 @@
 package Client;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Client extends Thread{
     private Socket client=null;
@@ -33,19 +31,14 @@ public class Client extends Thread{
             InputStream inputStream = client.getInputStream();//服务器端发回的数据
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
             System.out.println("client is ready");
-            String fileName="src\\Client\\Resource\\"+"Message1";
-            File file=new File(fileName);
-            Scanner sc=new Scanner(file);
-            String request = "";
-            while(true) {
-                request = request + sc.nextLine();
-                if (!sc.hasNext()){break;}
-            }
-            outputStream.write(request.getBytes());
+
+            ForInput forInput=new ForInput();
+            outputStream.write(forInput.getHttpRequest());//request结束
+
             byte[] temp=new byte[102400];
             inputStream.read(temp);
             byte[] out=copyValidByte(temp);
-            HttpClientHandler hch=new HttpClientHandler(request.getBytes(),out);
+            HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),out);
 
             int state=hch.response();
             switch (state){
