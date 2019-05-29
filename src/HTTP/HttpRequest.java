@@ -17,6 +17,7 @@ public class HttpRequest extends HttpObject {
         this.headers = headers;
         this.body = body;
         this.headerCount = headers.size();
+//        System.out.println("start"+startLine);
     }
 
     public String getMethod() {

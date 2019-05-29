@@ -30,10 +30,8 @@ public class Client extends Thread{
         {
             InputStream inputStream = client.getInputStream();//服务器端发回的数据
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
-//            while (true)
-//            {
             System.out.println("client is ready");
-            String fileName="src\\Client\\Resource\\"+"testMessage1";
+            String fileName="src\\Client\\Resource\\"+"Message1";
             File file=new File(fileName);
             Scanner sc=new Scanner(file);
             String request = "";
@@ -41,7 +39,6 @@ public class Client extends Thread{
                 request = request + sc.nextLine();
                 if (!sc.hasNext()){break;}
             }
-            System.out.println(request);
             outputStream.write(request.getBytes());
             byte[] temp=new byte[102400];
             inputStream.read(temp);
