@@ -29,6 +29,8 @@ public class HttpServerHandler {
         char temp;
         int flag = 0;
         boolean isBody = false;
+        int contentLength = 0;
+
         codeAndReason.put(200, "OK");
         codeAndReason.put(301, "Moved Permanently");
         codeAndReason.put(302, "Found");
@@ -81,12 +83,16 @@ public class HttpServerHandler {
             }
         }
 
+        if(headers.containsKey("Content-length")){
+            contentLength = Integer.parseInt(headers.get("Content-length"));
+        }
+
         /*
         将主体的Byte[]变成byte[]
         是否有更方便的做法？
          */
-        byte[] res = new byte[body.size()];
-        for(int i=0; i<body.size(); i++){
+        byte[] res = new byte[contentLength];
+        for(int i=0; i<res.length; i++){
             res[i] = body.get(i).byteValue();
         }
 

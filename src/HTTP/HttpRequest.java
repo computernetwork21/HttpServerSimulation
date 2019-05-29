@@ -37,7 +37,7 @@ public class HttpRequest extends HttpObject {
 
     public boolean getConnectionState(){
         String state = headers.get("Connection");
-        if(state.equals("close")){
+        if(state!=null && state.equals("close")){
             return false;
         }else {
             return true;

@@ -37,8 +37,7 @@ public class Server extends Thread{
                 while (true){
                     byte[] b = new byte[102400];
                     if(ips.read(b) != 0){
-                        byte[] data = copyValidByte(b);
-                        HttpServerHandler httpServerHandler = new HttpServerHandler(data);
+                        HttpServerHandler httpServerHandler = new HttpServerHandler(b);
                         System.out.println("***收到新报文***");
                         httpServerHandler.process();
                         ops.write(httpServerHandler.getResponse());
