@@ -36,14 +36,18 @@ public class Server extends Thread{
                 OutputStream ops = server.getOutputStream();
                 while (true){
                     byte[] b = new byte[102400];
-                    ips.read(b);
-                    byte[] data = copyValidByte(b);
-                    HttpServerHandler httpServerHandler = new HttpServerHandler(data);
-                    httpServerHandler.process();
-                    ops.write(httpServerHandler.getResponse());
-                    ops.flush();
-                    if(!httpServerHandler.getConnectionState()){
-                        break;
+                    if(ips.read(b) != 0){
+                        byte[] data = copyValidByte(b);
+                        HttpServerHandler httpServerHandler = new HttpServerHandler(data);
+                        System.out.println("***收到新报文***");
+                        httpServerHandler.process();
+                        ops.write(httpServerHandler.getResponse());
+                        ops.flush();
+                        System.out.println("***响应报文已发送***");
+                        if(!httpServerHandler.getConnectionState()){
+                            System.out.println("***长连接关闭***");
+                            break;
+                        }
                     }
                 }
 
