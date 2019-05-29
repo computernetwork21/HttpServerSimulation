@@ -91,7 +91,7 @@ public class HttpServerHandler {
         将主体的Byte[]变成byte[]
         是否有更方便的做法？
          */
-        byte[] res = new byte[contentLength];
+        byte[] res = new byte[body.size()];
         for(int i=0; i<res.length; i++){
             res[i] = body.get(i).byteValue();
         }

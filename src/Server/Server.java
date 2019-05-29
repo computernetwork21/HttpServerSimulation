@@ -35,7 +35,7 @@ public class Server extends Thread{
                 InputStream ips = server.getInputStream();
                 OutputStream ops = server.getOutputStream();
                 while (true){
-                    byte[] b = new byte[102400];
+                    byte[] b = new byte[ips.available()];
                     if(ips.read(b) != 0){
                         HttpServerHandler httpServerHandler = new HttpServerHandler(b);
                         System.out.println("***收到新报文***");
@@ -63,21 +63,4 @@ public class Server extends Thread{
         }
     }
 
-    private byte[] copyValidByte(byte[] read) {
-        ArrayList<Byte> t = new ArrayList<>();
-        int count = 0;
-        for(byte b : read){
-            if(b != 0){
-                t.add(b);
-                count++;
-            }else {
-                break;
-            }
-        }
-        byte[] data = new byte[count];
-        for(int i=0; i<count; i++){
-            data[i] = t.get(i);
-        }
-        return data;
-    }
 }
