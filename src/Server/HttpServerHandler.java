@@ -145,6 +145,7 @@ public class HttpServerHandler {
         }else {
             String fileName = getFileNameFromUrl(url);
             String type = fileName.split("\\.")[1];
+            System.out.println("-------filename is "+fileName);
             switch (resourceKeeper.getStatus(fileName)){
                 case "valid":
                     if(url.equals(resourceKeeper.getPath(fileName))){
@@ -242,6 +243,7 @@ public class HttpServerHandler {
         headers.put("Location", tempPath);
         headers.put("Content-type", "text/plain");
         String s = "资源临时地址：" + tempPath;
+     //   System.out.println("----"+s);
         byte[] body = s.getBytes();
         headers.put("Content-length", String.valueOf(body.length));
         httpResponse = new HttpResponse(buildStartLine(302), headers, body);

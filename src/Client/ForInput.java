@@ -41,7 +41,7 @@ public class ForInput {
             headers.put("If-modified-since", "2019-05-20 09:19:29");
 
             System.out.println("Input file name:");
-            String startLine = "GET src/Server/Resource/"+sc.nextLine()+" HTTP/1.1";
+            String startLine = "GET src/Server/Resource/New/"+sc.nextLine()+" HTTP/1.1";
             headers.put("Accept","image/jpeg");
             byte[] body=new byte[0];
             httpRequest = new HttpRequest(startLine, headers, body);

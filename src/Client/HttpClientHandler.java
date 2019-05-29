@@ -22,17 +22,7 @@ public class HttpClientHandler {
     private static byte[] body0;
     private HttpRequest httpRequest;
     private HttpResponse httpResponse;
-   /** private static Map<Integer, String> codeAndReason = new HashMap<Integer, String>(){
-        {
-            codeAndReason.put(200, "OK");
-            codeAndReason.put(301, "Moved Permanently");
-            codeAndReason.put(302, "Found");
-            codeAndReason.put(304, "Not Modified");
-            codeAndReason.put(404, "Not Found");
-            codeAndReason.put(405, "Method Not Allowed");
-            codeAndReason.put(500, "Internal Server Error");
-        }
-    };*/
+
     private static   Map<String, String> mimes = new HashMap<>();
 
 
@@ -84,9 +74,10 @@ public class HttpClientHandler {
         char temp;
         int flag = 0;
         boolean isBody = false;
+        int contentLength = 0;
 
         ArrayList<Byte> body = new ArrayList<>();
-        String startLine;
+        String startLine="";
         Map<String, String> headers = new HashMap<>();
 
         /*
@@ -114,6 +105,8 @@ public class HttpClientHandler {
          */
         String[] text = sb.toString().split("\r\n");
         startLine = text[0];
+     //   System.out.println("------------startLine="+startLine);
+
         for (int i=1; i<text.length; i++){
             if(text[i] != ""){
                 String[] header = text[i].split(": ");
@@ -121,15 +114,25 @@ public class HttpClientHandler {
             }
         }
 
+        if(headers.containsKey("Content-length")){
+            contentLength = Integer.parseInt(headers.get("Content-length"));
+        }
+
         /*
         将主体的Byte[]变成byte[]
         是否有更方便的做法？
          */
+   //     System.out.println("-------bodysize is "+body.size());
+    //    System.out.println("-------content length = "+contentLength);
         byte[] res = new byte[body.size()];
         for(int i=0; i<body.size(); i++){
-            res[i] = body.get(i).byteValue();
+            res[i] = body.get(i);
         }
+  /*      for(int i=0; i<res.length; i++){
+            res[i] = body.get(i).byteValue();
+        } */
 
+       // System.out.println("----------res length is "+res.length);
         httpResponse = new HttpResponse(startLine, headers, res);
     }
 
@@ -184,7 +187,7 @@ public class HttpClientHandler {
 
     }
     private int do200(){
-        if(httpResponse.getBody().equals("Received!".getBytes())){
+        if(method.equals("POST")){
             //请求报文方法是POST
             System.out.println("服务器端已收到。"); //暂定
             return 2001;
@@ -199,7 +202,7 @@ public class HttpClientHandler {
         while(true){
             try {
                 fileName=br.readLine();
-                fileName="src\\Client\\Resource"+fileName+mimes.get(httpResponse.getHeader("Content-type"));
+                fileName="src\\Client\\Resource\\"+fileName+mimes.get(httpResponse.getHeader("Content-type"));
                 if(new File(fileName).exists()){
                     //文件已存在
                     System.out.println("文件已存在，请重新输入文件名。");
@@ -221,7 +224,7 @@ public class HttpClientHandler {
             }
             else{
                 FileWriter fw = new FileWriter(file);
-                fw.write(httpResponse.getBody().toString());
+                fw.write(new String(httpResponse.getBody()));
                 fw.close();
             }
             System.out.println("文件已保存在"+fileName);
@@ -262,16 +265,18 @@ public class HttpClientHandler {
         //更新URL
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept","*");
-        headers.put("Host",httpResponse.getBody().toString().substring(12));
-        httpRequest=new HttpRequest(buildStartLine(httpResponse.getBody().toString().substring(12)),headers,null);
+        String url=new String(Arrays.copyOfRange(httpResponse.getBody(),18,httpResponse.toByteArray().length));
+        headers.put("Host",url);
+        httpRequest=new HttpRequest(buildStartLine(url),headers,null);
         return http2bytes();
     }
     public byte[] do302(){
         //更新URL
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept","*");
-        headers.put("Host",httpResponse.getBody().toString().substring(14));
-        httpRequest=new HttpRequest(buildStartLine(httpResponse.getBody().toString().substring(14)),headers,body0);
+        String url=new String(Arrays.copyOfRange(httpResponse.getBody(),21,httpResponse.toByteArray().length));
+        headers.put("Host",url);
+        httpRequest=new HttpRequest(buildStartLine(url),headers,body0);
         return http2bytes();
     }
     private int do304(){
@@ -280,11 +285,13 @@ public class HttpClientHandler {
     }
 
     private String buildStartLine(String url){
+     //   System.out.println("-------new url is "+url);
         //请求报文<method><url><version>
         StringBuffer sb = new StringBuffer();
         sb.append(method);
+        sb.append(" ");
         sb.append(url);
-        sb.append("HTTP/1.1 ");
+        sb.append(" HTTP/1.1 ");
         return sb.toString();
     }
 
@@ -293,7 +300,7 @@ public class HttpClientHandler {
         temp=temp+httpRequest.getMethod()+" "+httpRequest.getUrl()+" "+httpRequest.getVersion()+"\r\n";
         Map<String,String> headers = httpRequest.getHeaders();
         for(String key:headers.keySet()){
-            temp=temp+key+":"+headers.get(key)+"\r\n";
+            temp=temp+key+": "+headers.get(key)+"\r\n";
         }
         temp=temp+"\r\n"+httpRequest.getBody().toString()+"\r\n";
         return temp.getBytes();

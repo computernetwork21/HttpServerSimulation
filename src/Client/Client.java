@@ -35,7 +35,7 @@ public class Client extends Thread{
             ForInput forInput=new ForInput();
             outputStream.write(forInput.getHttpRequest());//request结束
 
-            byte[] temp=new byte[102400];
+            byte[] temp = new byte[102400];
             inputStream.read(temp);
             byte[] out=copyValidByte(temp);
             HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),out);
@@ -47,6 +47,7 @@ public class Client extends Thread{
                     //发给服务器端
                 case  302:
                     outputStream.write(hch.do302());
+                    System.out.println("---新报文已发送---");
                     //发给服务器端
             }
 //            }
