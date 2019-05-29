@@ -145,7 +145,9 @@ public class HttpServerHandler {
         }else {
             String fileName = getFileNameFromUrl(url);
             String type = fileName.split("\\.")[1];
-            switch (resourceKeeper.getStatus(fileName)){
+            String status = resourceKeeper.getStatus(fileName);
+            if(status==null){status="";}
+            switch (status){
                 case "valid":
                     if(url.equals(resourceKeeper.getPath(fileName))){
                         do200(readFile(url), type);
@@ -157,7 +159,9 @@ public class HttpServerHandler {
                     do404();
                     break;
                 case "temp":
-                    do302(url);
+                    String tempFileName = resourceKeeper.getTempFileName(fileName);
+                    String tempUrl = "src/Server/Resource/Temp/" + tempFileName;
+                    do302(tempUrl);
                     break;
                 default:
                     do404();

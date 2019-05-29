@@ -14,17 +14,18 @@ public class ServerTest {
     public static void main(String[] args) throws IOException {
         String serverName = "localhost";
 
-        String startLine = "POST src/Server/Resource/New/ HTTP/1.1";
+        String startLine = "GET src/Server/Resource/New/5.jpg HTTP/1.1";
         Map<String, String> headers = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("Date", sdf.format(new Date()));
 //        headers.put("If-Modified-Since", sdf.format(new Date()));
-        File f = new File("src/Server/Resource/1.jpeg");
-        InputStream ips = new FileInputStream(f);
-        byte[] body = ips.readAllBytes();
+//        File f = new File("src/Server/Resource/1.jpeg");
+//        InputStream ips = new FileInputStream(f);
+//        byte[] body = ips.readAllBytes();
 //        System.out.println(body.length);
-        headers.put("Content-type", "image/jpeg");
-        headers.put("Content-length", String.valueOf(body.length));
-        HttpRequest httpRequest = new HttpRequest(startLine, headers, body);
+//        headers.put("Content-type", "image/jpeg");
+//        headers.put("Content-length", String.valueOf(body.length));
+        HttpRequest httpRequest = new HttpRequest(startLine, headers, null);
 
 //        File f = new File("src/Client/Resource/Message1");
 //        InputStream ips = new FileInputStream(f);
@@ -39,9 +40,9 @@ public class ServerTest {
 //        ops.flush();
 //        ops.close();
 
-//        HttpServerHandler httpServerHandler = new HttpServerHandler(test);
-//        httpServerHandler.process();
-//        System.out.println(httpServerHandler.getResponseStartLineAndHeaders());
+        HttpServerHandler httpServerHandler = new HttpServerHandler(test);
+        httpServerHandler.process();
+        System.out.println(httpServerHandler.getResponseStartLineAndHeaders());
 
 
         int port = 80;
