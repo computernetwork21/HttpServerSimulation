@@ -105,7 +105,6 @@ public class HttpClientHandler {
          */
         String[] text = sb.toString().split("\r\n");
         startLine = text[0];
-     //   System.out.println("------------startLine="+startLine);
 
         for (int i=1; i<text.length; i++){
             if(text[i] != ""){

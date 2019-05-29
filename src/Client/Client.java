@@ -1,5 +1,7 @@
 package Client;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -32,13 +34,22 @@ public class Client extends Thread{
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
             System.out.println("client is ready");
 
+            //request
             ForInput forInput=new ForInput();
-            outputStream.write(forInput.getHttpRequest());//request结束
+            outputStream.write(forInput.getHttpRequest());
 
-            byte[] temp = new byte[102400];
+            //Response
+            //get available byte[].length=availble
+            int count = 0;
+            Thread.sleep(200);
+            while (count == 0) {
+                count = inputStream.available();
+            }
+            byte[] temp=new  byte[count];
             inputStream.read(temp);
-            byte[] out=copyValidByte(temp);
-            HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),out);
+
+            //handle response
+            HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),temp);
 
             int state=hch.response();
             switch (state){
@@ -58,23 +69,7 @@ public class Client extends Thread{
         }
     }
 
-    private byte[] copyValidByte(byte[] read){
-        ArrayList<Byte> t = new ArrayList<>();
-        int count = 0;
-        for(byte b : read){
-            if(b != 0){
-                t.add(b);
-                count++;
-            }else {
-                break;
-            }
-        }
-        byte[] data = new byte[count];
-        for(int i=0; i<count; i++){
-            data[i] = t.get(i);
-        }
-        return data;
-    }
+}
 
     //发送/接收
     //设计一套用户指令，包括 发送报文、构建报文（纯文本报文/带文件报文）、打印发送的报文、打印收到的报文的开始行和首部
@@ -85,4 +80,4 @@ public class Client extends Thread{
     //预存示例用的报文？
     //需要打日志吗？
 
-}
+
