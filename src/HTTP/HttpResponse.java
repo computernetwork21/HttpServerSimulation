@@ -33,7 +33,4 @@ public class HttpResponse extends HttpObject{
         return headers;
     }
 
-    public byte[] getBody(){
-        return body;
-    }
 }

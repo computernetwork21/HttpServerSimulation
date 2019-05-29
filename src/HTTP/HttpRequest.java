@@ -35,12 +35,12 @@ public class HttpRequest extends HttpObject {
         return headers;
     }
 
-    public byte[] getBody(){
-        return body;
-    }
-
     public boolean getConnectionState(){
         String state = headers.get("Connection");
-        return state==null;
+        if(state.equals("close")){
+            return false;
+        }else {
+            return true;
+        }
     }
 }
