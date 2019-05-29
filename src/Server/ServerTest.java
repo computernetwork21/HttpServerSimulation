@@ -14,7 +14,7 @@ public class ServerTest {
     public static void main(String[] args) throws IOException {
         String serverName = "localhost";
 
-        String startLine = "GET src/Server/Resource/New/5.jpg HTTP/1.1";
+        String startLine = "GET src/Server/Resource/New/3.html HTTP/1.1";
         Map<String, String> headers = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         headers.put("Date", sdf.format(new Date()));
