@@ -122,17 +122,10 @@ public class HttpClientHandler {
         将主体的Byte[]变成byte[]
         是否有更方便的做法？
          */
-   //     System.out.println("-------bodysize is "+body.size());
-    //    System.out.println("-------content length = "+contentLength);
         byte[] res = new byte[body.size()];
         for(int i=0; i<body.size(); i++){
             res[i] = body.get(i);
         }
-  /*      for(int i=0; i<res.length; i++){
-            res[i] = body.get(i).byteValue();
-        } */
-
-       // System.out.println("----------res length is "+res.length);
         httpResponse = new HttpResponse(startLine, headers, res);
     }
 
@@ -199,6 +192,7 @@ public class HttpClientHandler {
         InputStreamReader is = new InputStreamReader(System.in); //new构造InputStreamReader对象
         BufferedReader br = new BufferedReader(is); //拿构造的方法传到BufferedReader中，此时获取到的就是整个缓存流
         String fileName="";
+        System.out.println("content type is "+httpResponse.getHeader("Content-type"));
         while(true){
             try {
                 fileName=br.readLine();
@@ -218,9 +212,13 @@ public class HttpClientHandler {
         try {
             file.createNewFile();
             if(httpResponse.getHeader("Content-type").equals("image/jpeg")){
-                FileImageOutputStream imageOutput = new FileImageOutputStream(file);
-                imageOutput.write(httpResponse.getBody(), 0,httpResponse.getBody().length);
-                imageOutput.close();
+                FileOutputStream fop = new FileOutputStream(file);
+                fop.write(httpResponse.getBody());
+                fop.flush();
+                fop.close();
+            //    FileImageOutputStream imageOutput = new FileImageOutputStream(file);
+             //   imageOutput.write(httpResponse.getBody(), 0,httpResponse.getBody().length);
+               // imageOutput.close();
             }
             else{
                 FileWriter fw = new FileWriter(file);

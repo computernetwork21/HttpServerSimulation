@@ -46,7 +46,7 @@ public class HttpServerHandler {
 
         reversedmime.put("txt", "text/plain");
         reversedmime.put("html", "text/html");
-        reversedmime.put(".jpeg", "image/jpeg");
+        reversedmime.put("jpeg", "image/jpeg");
 
         ArrayList<Byte> body = new ArrayList<>();
         String startLine;
@@ -136,7 +136,22 @@ public class HttpServerHandler {
             File f = new File(url);
             try {
                 if (new Date(f.lastModified()).after(sdf.parse(ifModified))) {
-                    do200(readFile(url), url.split("\\.")[1]);
+                    //读图片的方式不一样
+                    String type = url.split("\\.")[1];
+                    if(type.equals("jpeg")){
+                        try{
+                            FileInputStream fileInputStream = new FileInputStream(f);
+                            byte[] b = fileInputStream.readAllBytes();
+                            do200(b,type);
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        do200(readFile(url),type);
+                    }
+             //       do200(readFile(url),type);
+
                 } else {
                     do304();
                 }
@@ -146,7 +161,6 @@ public class HttpServerHandler {
         } else {
             String fileName = getFileNameFromUrl(url);
             String type = fileName.split("\\.")[1];
-
             String status = resourceKeeper.getStatus(fileName);
             if (status == null) {
                 status = "";
@@ -154,7 +168,22 @@ public class HttpServerHandler {
             switch (status) {
                 case "valid":
                     if (url.equals(resourceKeeper.getPath(fileName))) {
-                        do200(readFile(url), type);
+                        //读图片的方式不一样
+                        if(type.equals("jpeg")){
+                            try{
+                                File f = new File(url);
+                                FileInputStream fileInputStream = new FileInputStream(f);
+                                byte[] b = fileInputStream.readAllBytes();
+                                do200(b,type);
+                            }catch (IOException e){
+                                e.printStackTrace();
+                            }
+                        }
+                        else {
+                            do200(readFile(url),type);
+                        }
+                        do200(readFile(url),type);
+
                     } else {
                         do301(resourceKeeper.getPath(fileName));
                     }
