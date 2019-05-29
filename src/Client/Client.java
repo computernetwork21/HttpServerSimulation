@@ -37,7 +37,10 @@ public class Client extends Thread{
                 File file=new File(fileName);
                 Scanner sc=new Scanner(file);
                 String request = "";
-                request=request+sc.nextLine();
+                while(true) {
+                    request = request + sc.nextLine();
+                    if (!sc.hasNext()){break;}
+                }
                 System.out.println(request);
                 outputStream.write(request.getBytes());
                 byte[] temp=new byte[102400];

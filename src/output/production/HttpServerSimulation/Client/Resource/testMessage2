@@ -1,0 +1,4 @@
+GET src/Server/Resource/New/ HTTP/1.1
+Connection:keep-alive
+Accept:text/plain,text/html,image/jpeg
+
