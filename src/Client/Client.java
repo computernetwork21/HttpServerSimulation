@@ -32,28 +32,31 @@ public class Client extends Thread{
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
 //            while (true)
 //            {
-                System.out.println("client is ready");
-                String fileName="src\\Client\\Resource\\"+"testMessage1";
-                File file=new File(fileName);
-                Scanner sc=new Scanner(file);
-                String request = "";
-                request=request+sc.nextLine();
-                System.out.println(request);
-                outputStream.write(request.getBytes());
-                byte[] temp=new byte[102400];
-                inputStream.read(temp);
-                byte[] out=copyValidByte(temp);
-                HttpClientHandler hch=new HttpClientHandler(request.getBytes(),out);
+            System.out.println("client is ready");
+            String fileName="src\\Client\\Resource\\"+"testMessage1";
+            File file=new File(fileName);
+            Scanner sc=new Scanner(file);
+            String request = "";
+            while(true) {
+                request = request + sc.nextLine();
+                if (!sc.hasNext()){break;}
+            }
+            System.out.println(request);
+            outputStream.write(request.getBytes());
+            byte[] temp=new byte[102400];
+            inputStream.read(temp);
+            byte[] out=copyValidByte(temp);
+            HttpClientHandler hch=new HttpClientHandler(request.getBytes(),out);
 
-                int state=hch.response();
-                switch (state){
-                    case 301:
-                        outputStream.write(hch.do301());
-                        //发给服务器端
-                    case  302:
-                        outputStream.write(hch.do302());
-                        //发给服务器端
-                }
+            int state=hch.response();
+            switch (state){
+                case 301:
+                    outputStream.write(hch.do301());
+                    //发给服务器端
+                case  302:
+                    outputStream.write(hch.do302());
+                    //发给服务器端
+            }
 //            }
         }
         catch (Exception e)
