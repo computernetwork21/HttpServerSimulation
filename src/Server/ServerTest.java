@@ -5,6 +5,8 @@ import HTTP.HttpResponse;
 
 import java.io.*;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,15 +14,21 @@ public class ServerTest {
     public static void main(String[] args) throws IOException {
         String serverName = "localhost";
 
-        String startLine = "POST src/Server/Resource/New HTTP/1.1";
+        String startLine = "GET src/Server/Resource/New/2.txt HTTP/1.1";
         Map<String, String> headers = new HashMap<>();
-//        headers.put("Accept", "*");
-        File f = new File("src/Server/Resource/1.jpeg");
-        InputStream ips = new FileInputStream(f);
-        byte[] body = ips.readAllBytes();
-        headers.put("Content-type", "image/jpeg");
-        headers.put("Content-length", String.valueOf(body.length));
-        HttpRequest httpRequest = new HttpRequest(startLine, headers, body);
+        headers.put("Accept", "*");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        headers.put("If-Modified-Since", sdf.format(new Date()));
+//        File f = new File("src/Server/Resource/1.jpeg");
+//        InputStream ips = new FileInputStream(f);
+//        byte[] body = ips.readAllBytes();
+//        headers.put("Content-type", "image/jpeg");
+//        headers.put("Content-length", String.valueOf(body.length));
+        HttpRequest httpRequest = new HttpRequest(startLine, headers, null);
+
+//        File f = new File("src/Client/Resource/testMessage1");
+//        InputStream ips = new FileInputStream(f);
+//        byte[] test = ips.readAllBytes();
 
         byte[] test = httpRequest.toByteArray();
         HttpServerHandler httpServerHandler = new HttpServerHandler(test);
