@@ -138,7 +138,7 @@ public class HttpServerHandler {
                 if (new Date(f.lastModified()).after(sdf.parse(ifModified))) {
                     //读图片的方式不一样
                     String type = url.split("\\.")[1];
-                    if(type.equals("jpeg")){
+                    /*if(type.equals("jpeg")){
                         try{
                             FileInputStream fileInputStream = new FileInputStream(f);
                             byte[] b = fileInputStream.readAllBytes();
@@ -149,8 +149,8 @@ public class HttpServerHandler {
                     }
                     else {
                         do200(readFile(url),type);
-                    }
-             //       do200(readFile(url),type);
+                    } */
+                do200(readFile(url),type);
 
                 } else {
                     do304();
@@ -169,7 +169,7 @@ public class HttpServerHandler {
                 case "valid":
                     if (url.equals(resourceKeeper.getPath(fileName))) {
                         //读图片的方式不一样
-                        if(type.equals("jpeg")){
+                       /* if(type.equals("jpeg")){
                             try{
                                 File f = new File(url);
                                 FileInputStream fileInputStream = new FileInputStream(f);
@@ -181,7 +181,7 @@ public class HttpServerHandler {
                         }
                         else {
                             do200(readFile(url),type);
-                        }
+                        }*/
                         do200(readFile(url),type);
 
                     } else {
@@ -265,7 +265,9 @@ public class HttpServerHandler {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             headers.put("Date", sdf.format(new Date()));
             headers.put("Location", newPath);
-            headers.put("Content-type", "text/plain");
+            String type = newPath.split("\\.")[1];
+            headers.put("Content-type",type);
+        //    headers.put("Content-type", "text/plain");
             String s = "资源新地址：" + newPath;
             byte[] body = s.getBytes();
             headers.put("Content-length", String.valueOf(body.length));
@@ -277,6 +279,8 @@ public class HttpServerHandler {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             headers.put("Date", sdf.format(new Date()));
             headers.put("Location", tempPath);
+         //   String type = tempPath.split("\\.")[1];
+          //  headers.put("Content-type",type);
             headers.put("Content-type", "text/plain");
             String s = "资源临时地址：" + tempPath;
             //   System.out.println("----"+s);
