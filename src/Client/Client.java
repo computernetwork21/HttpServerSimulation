@@ -120,6 +120,7 @@ public class Client extends Thread{
         fileMap.put("3.html",DefaultTargetUrl+"3.html");
         fileMap.put("3_301.html",DefaultTargetUrl+"3_301.html");
         fileMap.put("3_302.html",DefaultTargetUrl+"3_302.html");
+        fileMap.put("4.txt",DefaultTargetUrl+"4.txt");
     }
 }
 

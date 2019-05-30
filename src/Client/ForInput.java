@@ -16,13 +16,8 @@ public class ForInput {
         Scanner sc = new Scanner(System.in);
         System.out.println("");
         String command="";
-        while (true){
-            System.out.println("POST/GET?");
+            System.out.println("Method:");
             command=sc.nextLine();
-            if (command.equals("GET")||command.equals("POST")){
-                break;
-            }
-        }
 
         if (command.equals("POST")) {
             String startLine = "POST src/Server/Resource/New/ HTTP/1.1";
@@ -76,6 +71,11 @@ public class ForInput {
 
             byte[] body=new byte[0];
             httpRequest = new HttpRequest(startLine, headers, body);
+        }
+        else {
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Connection", "keep-alive");
+            httpRequest=new HttpRequest("GET "+""+" HTTP/1.1",headers,new byte[0]);
         }
 //20190528232257.jpeg
     }
