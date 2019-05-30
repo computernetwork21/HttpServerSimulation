@@ -168,22 +168,7 @@ public class HttpServerHandler {
             switch (status) {
                 case "valid":
                     if (url.equals(resourceKeeper.getPath(fileName))) {
-                        //读图片的方式不一样
-                        if(type.equals("jpeg")){
-                            try{
-                                File f = new File(url);
-                                FileInputStream fileInputStream = new FileInputStream(f);
-                                byte[] b = fileInputStream.readAllBytes();
-                                do200(b,type);
-                            }catch (IOException e){
-                                e.printStackTrace();
-                            }
-                        }
-                        else {
-                            do200(readFile(url),type);
-                        }
                         do200(readFile(url),type);
-
                     } else {
                         do301(resourceKeeper.getPath(fileName));
                     }

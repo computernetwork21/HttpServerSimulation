@@ -14,7 +14,7 @@ public class ServerTest {
     public static void main(String[] args) throws IOException {
         String serverName = "localhost";
 
-        String startLine = "GET src/Server/Resource/New/3.html HTTP/1.1";
+        String startLine = "GET src/Server/Resource/Temp/3t.html HTTP/1.1";
         Map<String, String> headers = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         headers.put("Date", sdf.format(new Date()));
@@ -45,29 +45,29 @@ public class ServerTest {
         System.out.println(httpServerHandler.getResponseStartLineAndHeaders());
 
 
-        int port = 80;
-        try{
-            System.out.println("连接到主机：" + serverName + " ，端口号：" + port);
-            Socket client = null;
-            try {
-                client = new Socket(serverName, port);
-           } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("远程主机地址：" + client.getRemoteSocketAddress());
-
-            OutputStream os = client.getOutputStream();
-            os.write(test);
-            os.flush();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            String s;
-            while ((s=br.readLine())!=null){
-                System.out.println(s);
-            }
-            client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        int port = 80;
+//        try{
+//            System.out.println("连接到主机：" + serverName + " ，端口号：" + port);
+//            Socket client = null;
+//            try {
+//                client = new Socket(serverName, port);
+//           } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("远程主机地址：" + client.getRemoteSocketAddress());
+//
+//            OutputStream os = client.getOutputStream();
+//            os.write(test);
+//            os.flush();
+//
+//            BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
+//            String s;
+//            while ((s=br.readLine())!=null){
+//                System.out.println(s);
+//            }
+//            client.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }
