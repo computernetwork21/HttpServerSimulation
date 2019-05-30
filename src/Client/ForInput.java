@@ -26,13 +26,23 @@ public class ForInput {
             System.out.println("");
             System.out.println("Input file name with suffix:");
             try {
-                String fileName = "src\\Client\\Resource\\";
-                fileName += sc.nextLine();
-                File f = new File(fileName);
+                FileName_Suffix = "src\\Client\\Resource\\";
+                FileName_Suffix += sc.nextLine();
+                File f = new File(FileName_Suffix);
                 InputStream is = new FileInputStream(f);
                 byte[] body = is.readAllBytes();
 
-                headers.put("Content-type", "image/jpeg");
+                String[] temp=FileName_Suffix.split("\\.");
+                if (temp[1].equals("jpeg")){
+                    headers.put("Content-type","image/jpeg");
+                }
+                else if (temp[1].equals("html")){
+                    headers.put("Content-type","text/html");
+                }
+                else if (temp[1].equals("txt")){
+                    headers.put("Content-type","text/plain");
+                }
+
                 headers.put("Content-length", String.valueOf(body.length));
                 httpRequest = new HttpRequest(startLine, headers, body);
                 is.close();
@@ -69,13 +79,13 @@ public class ForInput {
                 headers.put("Accept","text/plain");
             }
 
-            byte[] body=new byte[0];
-            httpRequest = new HttpRequest(startLine, headers, body);
+            httpRequest = new HttpRequest(startLine, headers, null);
         }
         else {
+            String startLine=command+" "+"/"+" HTTP/1.1";
             Map<String, String> headers = new HashMap<>();
             headers.put("Connection", "keep-alive");
-            httpRequest=new HttpRequest("GET "+""+" HTTP/1.1",headers,new byte[0]);
+            httpRequest=new HttpRequest(startLine,headers,null);
         }
 //20190528232257.jpeg
     }
