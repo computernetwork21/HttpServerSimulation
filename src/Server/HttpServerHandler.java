@@ -250,11 +250,8 @@ public class HttpServerHandler {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             headers.put("Date", sdf.format(new Date()));
             headers.put("Location", tempPath);
-         //   String type = tempPath.split("\\.")[1];
-          //  headers.put("Content-type",type);
             headers.put("Content-type", "text/plain");
             String s = "资源临时地址：" + tempPath;
-            //   System.out.println("----"+s);
             byte[] body = s.getBytes();
             headers.put("Content-length", String.valueOf(body.length));
             httpResponse = new HttpResponse(buildStartLine(302), headers, body);

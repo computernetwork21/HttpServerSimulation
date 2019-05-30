@@ -18,8 +18,9 @@ public class HttpClientHandler {
     //对mime类型的处理
     //对301、302、304的处理???重定向的处理
 
-    private static String method;
-    private static byte[] body0;
+    private static String method; //请求报文的方法
+    private static String url;  //请求报文的路径
+    private static byte[] body0;  //请求报文的body
     private HttpRequest httpRequest;
     private HttpResponse httpResponse;
 
@@ -52,6 +53,8 @@ public class HttpClientHandler {
         }
         String[] startLineInfo = sb0.toString().split(" ");
         method=startLineInfo[0];
+        url=startLineInfo[1];
+
         //body
         flag0=0;
         int j=0;
@@ -209,7 +212,7 @@ public class HttpClientHandler {
         }
     */
         //fileName从响应报文的url里来
-        String fileName = getFileNameFromUrl(httpResponse.getHeader("Location"));
+        String fileName = getFileNameFromUrl(url);
         fileName="src/Client/Resource/"+fileName;
         File file = new File(fileName);
         try {
@@ -307,7 +310,7 @@ public class HttpClientHandler {
     }
 
     private String getFileNameFromUrl (String url){
-        String[] t = url.split("//");
+        String[] t = url.split("/");
         if (t.length == 0) {
             return url;
         } else {
