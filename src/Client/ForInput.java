@@ -3,6 +3,8 @@ package Client;
 import HTTP.HttpRequest;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -17,9 +19,7 @@ public class ForInput {
             String startLine = "POST src/Server/Resource/New/ HTTP/1.1";
             Map<String, String> headers = new HashMap<>();
             headers.put("Connection", "keep-alive");
-//            headers.put("If-Modified-Since", "2019-05-20 09:19:29");
-
-            System.out.println("Input file name:");
+            System.out.println("Input file name with suffix:");
             try {
                 String fileName = "src\\Client\\Resource\\";
                 fileName += sc.nextLine();
@@ -40,10 +40,21 @@ public class ForInput {
             headers.put("Connection", "keep-alive");
 //            headers.put("If-modified-Since", "2019-05-20 09:19:29");
 
-            System.out.println("Input file name:");
-            String filename=sc.nextLine();
-            String startLine = "GET src/Server/Resource/New/"+filename+" HTTP/1.1";
-            String[] temp=filename.split("\\.");
+            System.out.println("Input file name with suffix:");
+            String FileName_Suffix=sc.nextLine();
+            String startLine = "GET src/Server/Resource/New/"+FileName_Suffix+" HTTP/1.1";
+
+            File file =new File("src\\Client\\Resource\\"+FileName_Suffix);
+            if(file.exists()){
+                Calendar cal = Calendar.getInstance();
+                long time = file.lastModified();
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                cal.setTimeInMillis(time);
+                String IMS=formatter.format(cal.getTime());
+                headers.put("If-Modified-Since",IMS);
+            }
+
+            String[] temp=FileName_Suffix.split("\\.");
             if (temp[1].equals("jpeg")){
                 headers.put("Accept","image/jpeg");
             }
@@ -54,6 +65,7 @@ public class ForInput {
                 headers.put("Accept","text/plain");
             }
             System.out.println("accepted:"+headers.get("Accept"));
+
             byte[] body=new byte[0];
             httpRequest = new HttpRequest(startLine, headers, body);
         }

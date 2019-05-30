@@ -186,7 +186,7 @@ public class HttpClientHandler {
         }
 
         //请求报文是get方法
-        //用户输入文件名，验证是否重名，然后保存
+   /*     //用户输入文件名，验证是否重名，然后保存
         System.out.println("请输入一个文件名：");
         InputStreamReader is = new InputStreamReader(System.in); //new构造InputStreamReader对象
         BufferedReader br = new BufferedReader(is); //拿构造的方法传到BufferedReader中，此时获取到的就是整个缓存流
@@ -207,17 +207,20 @@ public class HttpClientHandler {
                 e.printStackTrace();
             }
         }
+    */
+        //fileName从响应报文的url里来
+        String fileName = getFileNameFromUrl(httpResponse.getHeader("Location"));
+        fileName="src/Client/Resource/"+fileName;
         File file = new File(fileName);
         try {
-            file.createNewFile();
+            if(!file.exists()){
+                file.createNewFile();
+            }
             if(httpResponse.getHeader("Content-type").equals("image/jpeg")){
                 FileOutputStream fop = new FileOutputStream(file);
                 fop.write(httpResponse.getBody());
                 fop.flush();
                 fop.close();
-            //    FileImageOutputStream imageOutput = new FileImageOutputStream(file);
-             //   imageOutput.write(httpResponse.getBody(), 0,httpResponse.getBody().length);
-               // imageOutput.close();
             }
             else{
                 FileWriter fw = new FileWriter(file);
@@ -301,5 +304,14 @@ public class HttpClientHandler {
         }
         temp=temp+"\r\n"+httpRequest.getBody().toString()+"\r\n";
         return temp.getBytes();
+    }
+
+    private String getFileNameFromUrl (String url){
+        String[] t = url.split("//");
+        if (t.length == 0) {
+            return url;
+        } else {
+            return t[t.length - 1];
+        }
     }
 }
