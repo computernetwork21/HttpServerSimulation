@@ -3,9 +3,12 @@ package Client;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Client extends Thread{
     private Socket client=null;
+    private Map<String,String> fileMap;//已知服务器的映射
 
     public static void main(String[] args) {
         Thread t = new Client(80);
@@ -25,17 +28,20 @@ public class Client extends Thread{
     }
 
     public void run() {
-        String targetUrl="src/Server/Resource/New/";
+        String NewUrl="";
+        setFileMap();//初始化fileMap
         try
         {
             InputStream inputStream = client.getInputStream();//服务器端发回的数据
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
             System.out.println("client is ready");
 
-            ForInput forInput=new ForInput(targetUrl);
-            outputStream.write(forInput.getHttpRequest());
+//            ForInput forInput=new ForInput(fileMap);
+//            outputStream.write(forInput.getHttpRequest());
 
             while (true){
+                ForInput forInput=new ForInput(fileMap);
+                outputStream.write(forInput.getHttpRequest());
 
                 //Response
                 //get available byte[].length=availble
@@ -53,7 +59,9 @@ public class Client extends Thread{
                 int state=hch.response();
                 if(state==301) {
                     outputStream.write(hch.do301());
-                    targetUrl = hch.getNewUrl();
+                    NewUrl = hch.getNewUrl();
+                    System.out.println("NewURL:"+NewUrl);
+                    fileMap.put(forInput.getFileName_Suffix(),NewUrl);
                     //发给服务器端
                 }
                  else if(state==302){
@@ -61,6 +69,9 @@ public class Client extends Thread{
                         System.out.println("---新报文已发送---");
                         //发给服务器端
                 }
+
+                 outputStream.flush();
+                Thread.sleep(1000);
             }
         }
 
@@ -71,6 +82,19 @@ public class Client extends Thread{
         }
     }
 
+    public void setFileMap(){
+        fileMap=new HashMap<>();
+        String DefaultTargetUrl="src/Server/Resource/New/";
+        fileMap.put("1.jpeg",DefaultTargetUrl+"1.jpeg");
+        fileMap.put("1_301.jpeg",DefaultTargetUrl+"1_301.jpeg");
+        fileMap.put("1_302.jpeg",DefaultTargetUrl+"1_302.jpeg");
+        fileMap.put("2.txt",DefaultTargetUrl+"2.txt");
+        fileMap.put("2_301.txt",DefaultTargetUrl+"2_301.txt");
+        fileMap.put("2_302.txt",DefaultTargetUrl+"2_302.txt");
+        fileMap.put("3.html",DefaultTargetUrl+"3.html");
+        fileMap.put("3_301.html",DefaultTargetUrl+"3_301.html");
+        fileMap.put("3_302.html",DefaultTargetUrl+"3_302.html");
+    }
 }
 
     //发送/接收

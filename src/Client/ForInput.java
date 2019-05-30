@@ -11,8 +11,8 @@ import java.util.Scanner;
 
 public class ForInput {
     private HttpRequest httpRequest;
-
-    ForInput(String Url) {
+    private String FileName_Suffix="";
+    ForInput(Map<String,String> fileMap) {
         Scanner sc = new Scanner(System.in);
         System.out.println("POST/GET?");
         if (sc.nextLine().equals("POST")) {
@@ -41,9 +41,9 @@ public class ForInput {
 //            headers.put("If-modified-Since", "2019-05-20 09:19:29");
 
             System.out.println("Input file name with suffix:");
-            String FileName_Suffix=sc.nextLine();
-            String startLine = "GET "+Url+FileName_Suffix+" HTTP/1.1";
-
+            FileName_Suffix=sc.nextLine();
+            String Url=fileMap.get(FileName_Suffix);
+            String startLine = "GET "+Url+" HTTP/1.1";
             File file =new File("src\\Client\\Resource\\"+FileName_Suffix);
             if(file.exists()){
                 Calendar cal = Calendar.getInstance();
@@ -75,4 +75,5 @@ public class ForInput {
         return this.httpRequest.toByteArray();
     }
 
+    public String getFileName_Suffix(){return this.FileName_Suffix;}
 }
