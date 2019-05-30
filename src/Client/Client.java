@@ -34,35 +34,38 @@ public class Client extends Thread{
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
             System.out.println("client is ready");
 
-            //request
             ForInput forInput=new ForInput();
             outputStream.write(forInput.getHttpRequest());
 
-            //Response
-            //get available byte[].length=availble
-            int count = 0;
-            Thread.sleep(200);
-            while (count == 0) {
-                count = inputStream.available();
-            }
-            byte[] temp=new  byte[count];
-            inputStream.read(temp);
+            while (true){
 
-            //handle response
-            HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),temp);
+                //Response
+                //get available byte[].length=availble
+                int count = 0;
+                Thread.sleep(200);
+                while (count == 0) {
+                    count = inputStream.available();
+                }
+                byte[] temp=new  byte[count];
+                inputStream.read(temp);
 
-            int state=hch.response();
-            switch (state){
-                case 301:
-                    outputStream.write(hch.do301());
-                    //发给服务器端
-                case  302:
-                    outputStream.write(hch.do302());
-                    System.out.println("---新报文已发送---");
-                    //发给服务器端
+                //handle response
+                HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),temp);
+
+                int state=hch.response();
+                switch (state){
+                    case 301:
+                        outputStream.write(hch.do301());
+                        //发给服务器端
+                    case  302:
+                        outputStream.write(hch.do302());
+                        System.out.println("---新报文已发送---");
+                        //发给服务器端
+                }
             }
-//            }
         }
+
+
         catch (Exception e)
         {
             e.printStackTrace();

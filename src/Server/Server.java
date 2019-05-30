@@ -2,7 +2,6 @@ package Server;
 
 import java.net.*;
 import java.io.*;
-import java.util.ArrayList;
 
 public class Server extends Thread{
     private ServerSocket serverSocket;
