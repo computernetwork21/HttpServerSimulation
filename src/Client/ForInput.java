@@ -17,7 +17,7 @@ public class ForInput {
             String startLine = "POST src/Server/Resource/New/ HTTP/1.1";
             Map<String, String> headers = new HashMap<>();
             headers.put("Connection", "keep-alive");
-            headers.put("If-Modified-Since", "2019-05-20 09:19:29");
+//            headers.put("If-Modified-Since", "2019-05-20 09:19:29");
 
             System.out.println("Input file name:");
             try {
@@ -38,20 +38,22 @@ public class ForInput {
         else {
             Map<String, String> headers = new HashMap<>();
             headers.put("Connection", "keep-alive");
-            headers.put("If-modified-Since", "2019-05-20 09:19:29");
+//            headers.put("If-modified-Since", "2019-05-20 09:19:29");
 
             System.out.println("Input file name:");
             String filename=sc.nextLine();
             String startLine = "GET src/Server/Resource/New/"+filename+" HTTP/1.1";
-            String[] temp=filename.split(".");
-            switch (temp[1]){
-                case "jpeg":
-                    headers.put("Accept","image/jpeg");
-                case "html":
-                    headers.put("Accept","text/html");
-                case "txt":
-                    headers.put("Accept","text/plain");
+            String[] temp=filename.split("\\.");
+            if (temp[1].equals("jpeg")){
+                headers.put("Accept","image/jpeg");
             }
+            else if (temp[1].equals("html")){
+                headers.put("Accept","text/html");
+            }
+            else if (temp[1].equals("txt")){
+                headers.put("Accept","text/plain");
+            }
+            System.out.println("accepted:"+headers.get("Accept"));
             byte[] body=new byte[0];
             httpRequest = new HttpRequest(startLine, headers, body);
         }

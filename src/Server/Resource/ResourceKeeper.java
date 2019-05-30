@@ -18,13 +18,21 @@ public class ResourceKeeper {
         fileStatus.put("3t.html", "valid");
         fileStatus.put("4.txt", "deleted");
 
-        filePath.put("1.jpeg", "src/Server/Resource/New/1.jpeg");
+        fileStatus.put("1o.jpeg", "valid");
+
+
+        //  filePath.put("1.jpeg", "src/Server/Resource/New/1.jpeg");
+        filePath.put("1.jpeg", "src/Server/Resource/Old/1o.jpeg");
+        filePath.put("1o.jpeg", "src/Server/Resource/Old/1o.jpeg");
+
         filePath.put("1.png", "src/Server/Resource/1.png");
         filePath.put("2.txt", "src/Server/Resource/New/2.txt");
         filePath.put("3.html", "src/Server/Resource/New/3.html");
         filePath.put("3t.html", "src/Server/Resource/Temp/3t.html");
 
         tempFile.put("3.html", "3t.html");
+        tempFile.put("1.jpeg", "1o.jpeg");
+
     }
 
     public String getStatus(String fileName){

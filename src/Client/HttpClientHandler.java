@@ -262,16 +262,16 @@ public class HttpClientHandler {
         //更新URL
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept","*");
-        String url=new String(Arrays.copyOfRange(httpResponse.getBody(),18,httpResponse.toByteArray().length));
+        String url=new String(Arrays.copyOfRange(httpResponse.getBody(),18,httpResponse.getBody().length));
         headers.put("Host",url);
-        httpRequest=new HttpRequest(buildStartLine(url),headers,null);
+        httpRequest=new HttpRequest(buildStartLine(url),headers,body0);
         return http2bytes();
     }
     public byte[] do302(){
         //更新URL
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept","*");
-        String url=new String(Arrays.copyOfRange(httpResponse.getBody(),21,httpResponse.toByteArray().length));
+        String url=new String(Arrays.copyOfRange(httpResponse.getBody(),21,httpResponse.getBody().length));
         headers.put("Host",url);
         httpRequest=new HttpRequest(buildStartLine(url),headers,body0);
         return http2bytes();
