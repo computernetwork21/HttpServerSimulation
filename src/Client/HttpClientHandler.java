@@ -23,6 +23,7 @@ public class HttpClientHandler {
     private static byte[] body0;  //请求报文的body
     private HttpRequest httpRequest;
     private HttpResponse httpResponse;
+    private String newUrl="";
 
     private static   Map<String, String> mimes = new HashMap<>();
 
@@ -269,6 +270,7 @@ public class HttpClientHandler {
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept","*");
         String url=new String(Arrays.copyOfRange(httpResponse.getBody(),18,httpResponse.getBody().length));
+        newUrl=url;
         headers.put("Host",url);
         httpRequest=new HttpRequest(buildStartLine(url),headers,body0);
         return http2bytes();
@@ -316,5 +318,8 @@ public class HttpClientHandler {
         } else {
             return t[t.length - 1];
         }
+    }
+    public String getNewUrl(){
+        return newUrl;
     }
 }
