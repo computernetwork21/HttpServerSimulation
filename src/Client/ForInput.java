@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class ForInput {
     private HttpRequest httpRequest;
 
-    ForInput() {
+    ForInput(String Url) {
         Scanner sc = new Scanner(System.in);
         System.out.println("POST/GET?");
         if (sc.nextLine().equals("POST")) {
@@ -42,7 +42,7 @@ public class ForInput {
 
             System.out.println("Input file name with suffix:");
             String FileName_Suffix=sc.nextLine();
-            String startLine = "GET src/Server/Resource/New/"+FileName_Suffix+" HTTP/1.1";
+            String startLine = "GET "+Url+FileName_Suffix+" HTTP/1.1";
 
             File file =new File("src\\Client\\Resource\\"+FileName_Suffix);
             if(file.exists()){

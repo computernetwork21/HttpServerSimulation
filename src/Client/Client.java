@@ -1,11 +1,8 @@
 package Client;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class Client extends Thread{
     private Socket client=null;
@@ -28,13 +25,14 @@ public class Client extends Thread{
     }
 
     public void run() {
+        String targetUrl="src/Server/Resource/New/";
         try
         {
             InputStream inputStream = client.getInputStream();//服务器端发回的数据
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
             System.out.println("client is ready");
 
-            ForInput forInput=new ForInput();
+            ForInput forInput=new ForInput(targetUrl);
             outputStream.write(forInput.getHttpRequest());
 
             while (true){
@@ -56,6 +54,7 @@ public class Client extends Thread{
                 switch (state){
                     case 301:
                         outputStream.write(hch.do301());
+                        targetUrl=hch.getNewUrl();
                         //发给服务器端
                     case  302:
                         outputStream.write(hch.do302());
