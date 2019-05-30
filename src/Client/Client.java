@@ -51,12 +51,12 @@ public class Client extends Thread{
                 HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),temp);
 
                 int state=hch.response();
-                switch (state){
-                    case 301:
-                        outputStream.write(hch.do301());
-                        targetUrl=hch.getNewUrl();
-                        //发给服务器端
-                    case  302:
+                if(state==301) {
+                    outputStream.write(hch.do301());
+                    targetUrl = hch.getNewUrl();
+                    //发给服务器端
+                }
+                 else if(state==302){
                         outputStream.write(hch.do302());
                         System.out.println("---新报文已发送---");
                         //发给服务器端
