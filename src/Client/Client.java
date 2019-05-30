@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Client extends Thread{
     private Socket client=null;
@@ -34,44 +35,69 @@ public class Client extends Thread{
         {
             InputStream inputStream = client.getInputStream();//服务器端发回的数据
             OutputStream outputStream = client.getOutputStream();//发送给服务器端的数据
-            System.out.println("client is ready");
-
-//            ForInput forInput=new ForInput(fileMap);
-//            outputStream.write(forInput.getHttpRequest());
-
+            System.out.println("Client is ready.");
             while (true){
+
                 ForInput forInput=new ForInput(fileMap);
+                System.out.println("");
+                System.out.println("***REQUEST***");
+                System.out.println(forInput.getRequest().startLineAndHeadersToString());
                 outputStream.write(forInput.getHttpRequest());
 
-                //Response
-                //get available byte[].length=availble
-                int count = 0;
-                Thread.sleep(200);
-                while (count == 0) {
-                    count = inputStream.available();
-                }
-                byte[] temp=new  byte[count];
-                inputStream.read(temp);
+                while (true){
+                    //Response
+                    //get available byte[].length=availble
+                    int count = 0;
+                    Thread.sleep(200);
+                    while (count == 0) {
+                        count = inputStream.available();
+                    }
+                    byte[] temp=new  byte[count];
+                    inputStream.read(temp);
 
-                //handle response
-                HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),temp);
+                    //handle response
+                    HttpClientHandler hch=new HttpClientHandler(forInput.getHttpRequest(),temp);
 
-                int state=hch.response();
-                if(state==301) {
-                    outputStream.write(hch.do301());
-                    NewUrl = hch.getNewUrl();
-                    System.out.println("NewURL:"+NewUrl);
-                    fileMap.put(forInput.getFileName_Suffix(),NewUrl);
-                    //发给服务器端
-                }
-                 else if(state==302){
-                        outputStream.write(hch.do302());
-                        System.out.println("---新报文已发送---");
+                    int state=hch.response();
+
+                    Thread.sleep(200);
+                    System.out.println("***RESPONSE***");
+                    System.out.println(hch.getResponseStartLineAndHeaders());
+
+                    if(state==301) {
+                        outputStream.write(hch.do301());
+                        System.out.println("***REQUEST***");
+                        System.out.println(hch.getRequestStartLineAndHeaders());
+                        NewUrl = hch.getNewUrl();
+                        fileMap.put(forInput.getFileName_Suffix(),NewUrl);
                         //发给服务器端
+                    }
+                    else if(state==302){
+                        System.out.println("***REQUEST***");
+                        System.out.println(hch.getRequestStartLineAndHeaders());
+                        outputStream.write(hch.do302());
+//                        System.out.println("---新报文已发送---");
+                        //发给服务器端
+                    }else {
+                        break;
+                    }
+
+                    outputStream.flush();
+                    Thread.sleep(4000);
                 }
 
-                 outputStream.flush();
-                Thread.sleep(1000);
+                String code="";
+                while (true){
+                    System.out.println("Do you want to exit? [yes/no]");
+                    Scanner scanner=new Scanner(System.in);
+                    code=scanner.nextLine();
+                    if(code.equals("yes")||code.equals("no")){
+                        break;
+                    }
+                }
+                if (code.equals("yes")){
+                    break;
+                }
             }
         }
 

@@ -14,11 +14,21 @@ public class ForInput {
     private String FileName_Suffix="";
     ForInput(Map<String,String> fileMap) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("POST/GET?");
-        if (sc.nextLine().equals("POST")) {
+        System.out.println("");
+        String command="";
+        while (true){
+            System.out.println("POST/GET?");
+            command=sc.nextLine();
+            if (command.equals("GET")||command.equals("POST")){
+                break;
+            }
+        }
+
+        if (command.equals("POST")) {
             String startLine = "POST src/Server/Resource/New/ HTTP/1.1";
             Map<String, String> headers = new HashMap<>();
             headers.put("Connection", "keep-alive");
+            System.out.println("");
             System.out.println("Input file name with suffix:");
             try {
                 String fileName = "src\\Client\\Resource\\";
@@ -35,11 +45,10 @@ public class ForInput {
                 e.printStackTrace();
             }
         }
-        else {
+        else if(command.equals("GET")){
             Map<String, String> headers = new HashMap<>();
             headers.put("Connection", "keep-alive");
-//            headers.put("If-modified-Since", "2019-05-20 09:19:29");
-
+            System.out.println("");
             System.out.println("Input file name with suffix:");
             FileName_Suffix=sc.nextLine();
             String Url=fileMap.get(FileName_Suffix);
@@ -64,16 +73,18 @@ public class ForInput {
             else if (temp[1].equals("txt")){
                 headers.put("Accept","text/plain");
             }
-            System.out.println("accepted:"+headers.get("Accept"));
 
             byte[] body=new byte[0];
             httpRequest = new HttpRequest(startLine, headers, body);
         }
 //20190528232257.jpeg
     }
+
     public byte[] getHttpRequest(){
         return this.httpRequest.toByteArray();
     }
 
     public String getFileName_Suffix(){return this.FileName_Suffix;}
+
+    public HttpRequest getRequest(){ return this.httpRequest;}
 }

@@ -149,13 +149,13 @@ public class HttpClientHandler {
             case 304:
                 return do304();
             case 404:                                           //暂定
-                System.out.println("Not found");
+//                System.out.println("Not found");
                 return 404;
             case 405:
-                System.out.println("方法不支持。");
+//                System.out.println("方法不支持。");
                 return 405;
             default:
-                System.out.println("Internal server error");
+//                System.out.println("Internal server error");
                 return 500;
         }
     }
@@ -185,7 +185,7 @@ public class HttpClientHandler {
     private int do200(){
         if(method.equals("POST")){
             //请求报文方法是POST
-            System.out.println("服务器端已收到。"); //暂定
+//            System.out.println("服务器端已收到。"); //暂定
             return 2001;
         }
 
@@ -231,7 +231,7 @@ public class HttpClientHandler {
                 fw.write(new String(httpResponse.getBody()));
                 fw.close();
             }
-            System.out.println("文件已保存在"+fileName);
+//            System.out.println("文件已保存在"+fileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -285,7 +285,7 @@ public class HttpClientHandler {
         return http2bytes();
     }
     private int do304(){
-        System.out.println("已刷新。");
+//        System.out.println("已刷新。");
         return 304;
     }
 
@@ -321,5 +321,12 @@ public class HttpClientHandler {
     }
     public String getNewUrl(){
         return newUrl;
+    }
+
+    public String getRequestStartLineAndHeaders() {
+        return httpRequest.startLineAndHeadersToString();
+    }
+    public String getResponseStartLineAndHeaders() {
+        return httpResponse.startLineAndHeadersToString();
     }
 }
