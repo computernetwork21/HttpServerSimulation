@@ -168,6 +168,7 @@ public class HttpServerHandler {
             switch (status) {
                 case "valid":
                     if (url.equals(resourceKeeper.getPath(fileName))) {
+<<<<<<< HEAD
                         //读图片的方式不一样
                        /* if(type.equals("jpeg")){
                             try{
@@ -182,8 +183,9 @@ public class HttpServerHandler {
                         else {
                             do200(readFile(url),type);
                         }*/
+=======
+>>>>>>> dadf457abd8afd8d9495681f59c970a2f503a51d
                         do200(readFile(url),type);
-
                     } else {
                         do301(resourceKeeper.getPath(fileName));
                     }

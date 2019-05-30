@@ -39,9 +39,11 @@ public class Server extends Thread{
                         HttpServerHandler httpServerHandler = new HttpServerHandler(b);
                         System.out.println("***收到新报文***");
                         httpServerHandler.process();
+                        System.out.println(httpServerHandler.getRequestStartLineAndHeaders());
                         ops.write(httpServerHandler.getResponse());
                         ops.flush();
                         System.out.println("***响应报文已发送***");
+                        System.out.println(httpServerHandler.getResponseStartLineAndHeaders());
                         if(!httpServerHandler.getConnectionState()){
                             System.out.println("***长连接关闭***");
                             break;
