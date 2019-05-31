@@ -4,10 +4,7 @@ import HTTP.HttpRequest;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class ForInput {
     private HttpRequest httpRequest;
@@ -32,18 +29,44 @@ public class ForInput {
                 InputStream is = new FileInputStream(f);
                 byte[] body = is.readAllBytes();
 
-                String[] temp=FileName_Suffix.split("\\.");
-                if (temp[1].equals("jpeg")){
-                    headers.put("Content-type","image/jpeg");
+                String flag="";
+                while (true){
+                    System.out.println("In to mode 500 ? [yes/no]");
+                    flag=sc.nextLine();
+                    if (flag.equals("yes")||flag.equals("no")){
+                        break;
+                    }
                 }
-                else if (temp[1].equals("html")){
-                    headers.put("Content-type","text/html");
-                }
-                else if (temp[1].equals("txt")){
-                    headers.put("Content-type","text/plain");
-                }
+                if (flag.equals("yes")){
+                    //500 模式
+                    Random random=new Random(1);
+                    int length= random.nextInt();
+                    headers.put("Content-length",String.valueOf(length));
 
-                headers.put("Content-length", String.valueOf(body.length));
+                    String[] temp=FileName_Suffix.split("\\.");
+                    if (temp[1].equals("jpeg")){
+                        headers.put("Content-type","text/txt");
+                    }
+                    else if (temp[1].equals("html")){
+                        headers.put("Content-type","image/jpeg");
+                    }
+                    else if (temp[1].equals("txt")){
+                        headers.put("Content-type","text/html");
+                    }
+                }else {//正常模式
+                    String[] temp=FileName_Suffix.split("\\.");
+                    if (temp[1].equals("jpeg")){
+                        headers.put("Content-type","image/jpeg");
+                    }
+                    else if (temp[1].equals("html")){
+                        headers.put("Content-type","text/html");
+                    }
+                    else if (temp[1].equals("txt")){
+                        headers.put("Content-type","text/plain");
+                    }
+
+                    headers.put("Content-length", String.valueOf(body.length));
+                }
                 httpRequest = new HttpRequest(startLine, headers, body);
                 is.close();
             } catch (IOException e) {
