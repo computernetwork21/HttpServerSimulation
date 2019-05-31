@@ -34,6 +34,7 @@ public class Server extends Thread{
                 InputStream ips = server.getInputStream();
                 OutputStream ops = server.getOutputStream();
                 while (true){
+                    Thread.sleep(200);
                     byte[] b = new byte[ips.available()];
                     if(ips.read(b) != 0){
                         HttpServerHandler httpServerHandler = new HttpServerHandler(b);
@@ -60,6 +61,8 @@ public class Server extends Thread{
             {
                 e.printStackTrace();
                 break;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
